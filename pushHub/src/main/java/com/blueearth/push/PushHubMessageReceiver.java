@@ -1,4 +1,4 @@
-package com.blueearth.receiver;
+package com.blueearth.push;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.blueearth.notification.XGNotification;
 import com.tencent.android.tpush.XGPushBaseReceiver;
 import com.tencent.android.tpush.XGPushClickedResult;
 import com.tencent.android.tpush.XGPushRegisterResult;
@@ -16,13 +15,8 @@ import com.tencent.android.tpush.XGPushTextMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-
-public class MessageReceiver extends XGPushBaseReceiver {
-    private Intent intent = new Intent("com.qq.xgdemo.activity.UPDATE_LISTVIEW");
-    public static final String LogTag = "xlftest";
+public class PushHubMessageReceiver extends XGPushBaseReceiver {
+    public static final String LogTag = "PushHub";
 
     private void show(Context context, String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
@@ -36,50 +30,7 @@ public class MessageReceiver extends XGPushBaseReceiver {
             return;
         }
 
-
-
-
-        Log.i("xlftest","content:"+notifiShowedRlt.toString());
-
-//        String customContent = notifiShowedRlt.getCustomContent();
-//        try {
-//            JSONObject objCustom = new JSONObject(customContent);
-//            String activityAction = objCustom.optString("intent_uri");
-//
-//            if (activityAction!=null && !activityAction.trim().equals("")){
-//                Intent intent = new Intent(activityAction);
-//                context.startActivity(intent);
-//            }
-//        } catch (JSONException e) {
-//            Log.e("xlftest","CustomContentToJsonObjectError",e);
-//        }
-
-
-
-
-
-
-////        Log.i("xlftest","getCustomContent:"+notifiShowedRlt.getCustomContent());
-//
-//        XGNotification notific = new XGNotification();
-//        notific.setMsg_id(notifiShowedRlt.getMsgId());
-//        notific.setTitle(notifiShowedRlt.getTitle());
-//        notific.setContent(notifiShowedRlt.getContent());
-//        // notificationActionType==1为Activity，2为url，3为intent
-//        notific.setNotificationActionType(notifiShowedRlt
-//                .getNotificationActionType());
-//        //Activity,url,intent都可以通过getActivity()获得
-//        notific.setActivity(notifiShowedRlt.getActivity());
-//        notific.setUpdate_time(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-//                .format(Calendar.getInstance().getTime()));
-////        NotificationService.getInstance(context).save(notific);
-//        context.sendBroadcast(intent);
-//
-//
-//
-//        show(context, "您有1条新消息, " + "通知被展示 ， " + notifiShowedRlt.toString());
-//        Log.d("xlftest", "+++++++++++++++++++++++++++++展示通知的回调");
-
+        Log.i(LogTag,"content:"+notifiShowedRlt.toString());
 
     }
 
@@ -138,7 +89,7 @@ public class MessageReceiver extends XGPushBaseReceiver {
     @Override
     public void onNotifactionClickedResult(Context context,
                                            XGPushClickedResult message) {
-        Log.e("xlftest", "+++++++++++++++ 通知被点击 跳转到指定页面。");
+        Log.e(LogTag, "+++++++++++++++ 通知被点击 跳转到指定页面。");
         NotificationManager notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();

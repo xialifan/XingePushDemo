@@ -1,6 +1,7 @@
 package com.blueearth.receiver;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.xiaomi.mipush.sdk.MiPushMessage;
 import com.xiaomi.mipush.sdk.PushMessageReceiver;
@@ -16,5 +17,6 @@ public class MiMessageReceiver extends PushMessageReceiver {
     @Override
     public void onReceivePassThroughMessage(Context context, MiPushMessage miPushMessage) {
         super.onReceivePassThroughMessage(context, miPushMessage);
+        Log.i("xlftest","onReceivePassThroughMessage:"+miPushMessage.getContent());
     }
 }

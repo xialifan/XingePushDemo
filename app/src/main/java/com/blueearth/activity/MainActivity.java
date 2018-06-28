@@ -1,20 +1,18 @@
 package com.blueearth.activity;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blueearth.receiver.MessageReceiver;
-import com.tencent.android.tpush.XGIOperateCallback;
-import com.tencent.android.tpush.XGPushConfig;
-import com.tencent.android.tpush.XGPushManager;
+import com.blueearth.push.PushHubProxy;
+//import com.tencent.android.tpush.XGIOperateCallback;
+//import com.tencent.android.tpush.XGPushConfig;
+//import com.tencent.android.tpush.XGPushManager;
 
 import blueearth.xingepushdemo.R;
 
@@ -27,7 +25,7 @@ import blueearth.xingepushdemo.R;
 
 public class MainActivity extends Activity {
 
-    private MsgReceiver updateListViewReceiver;
+//    private MsgReceiver updateListViewReceiver;
     private TextView tvReceiveInfo;
     private TextView tvToken;
 
@@ -36,77 +34,65 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        logData(getIntent(),"oncreate");
+
+
         tvReceiveInfo = findViewById(R.id.main_tv_receiveInfo);
         tvToken = findViewById(R.id.main_tv_token);
 
-        //清除通知栏消息
-        //XGPushManager.cancelAllNotifaction();
+        tvToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent Intent = new Intent("blueearthdetailactivity");
+                startActivity(Intent);
 
-        //代码内动态注册access ID
-        XGPushConfig.setAccessKey(this,"AR289TQSF84M");
-        XGPushConfig.setAccessId(this,2100297266);
+            }
+        });
 
-        XGPushConfig.setMiPushAppId(this, "2882303761517828158");
-        XGPushConfig.setMiPushAppKey(this, "5951782885158");
+        //推送注册代理
+        PushHubProxy pushHubProxy = new PushHubProxy(this);
 
-        //打开第三方推送
-        XGPushConfig.enableOtherPush(this, true);
+        pushHubProxy.setPushHubListener(new PushHubProxy.PushHubListener() {
+            @Override
+            public void onRegisterSuccess(String token, int flag) {
+                Toast.makeText(MainActivity.this,"注册成功",Toast.LENGTH_SHORT).show();
+                tvToken.setText("token:"+token);
+            }
 
-//        XG_ACCESS_ID:"2100297266 ",
-//        XG_ACCESS_KEY : "AR289TQSF84M",
+            @Override
+            public void onRegisterFail(String msg, int errCode) {
+                Toast.makeText(MainActivity.this,"注册失败",Toast.LENGTH_SHORT).show();
+                tvToken.setText("fail:"+msg+" code:"+errCode);
 
-        //开启信鸽的日志输出，线上版本不建议调用
-        XGPushConfig.enableDebug(this, true);
-//        XGPushConfig.getToken(this);
-        //注册数据更新监听器
-        updateListViewReceiver = new MsgReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.qq.xgdemo.activity.UPDATE_LISTVIEW");
-        registerReceiver(updateListViewReceiver, intentFilter);
-//        // 1.获取设备Token
-//        Handler handler = new HandlerExtension(MainActivity.this);
-//        m = handler.obtainMessage();
-        /*
-        注册信鸽服务的接口
-        如果仅仅需要发推送消息调用这段代码即可
-        */
-        XGPushManager.registerPush(getApplicationContext(),
-                new XGIOperateCallback() {
-                    @Override
-                    public void onSuccess(Object data, int flag) {
-                        String token = (String) data;
-                        Log.i("xlftest",token);
-                        tvToken.setText(token);
-                        Toast.makeText(MainActivity.this,token,Toast.LENGTH_SHORT).show();
-                    }
+            }
+        });
+        pushHubProxy.startRegisterPush();
 
-                    @Override
-                    public void onFail(Object data, int errCode, String msg) {
-                        String info = (String) data;
-                        Log.i("xlftest",msg);
-                        tvToken.setText(msg);
-                        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_SHORT).show();
-                    }
-                });
 
-        // 获取token
-        XGPushConfig.getToken(this);
+//        startRegisterPush();
+
 
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(updateListViewReceiver);
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        logData(intent,"onNewIntent");
+
     }
 
-    public static class MsgReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-//            allRecorders = notificationService.getCount();
-//            getNotificationswithouthint(id);
+    public static void logData(Intent intent,String tag) {
+        if (intent.getData()!=null){
+            Log.i("xlftest",tag+"/"+intent.getData().toString());
+        }else{
+            Log.i("xlftest",tag+"/"+"data is null");
         }
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
 }
